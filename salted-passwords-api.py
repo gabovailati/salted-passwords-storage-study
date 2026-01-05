@@ -1,7 +1,6 @@
 from flask import Flask, request, jsonify
 import sqlite3
 import bcrypt
-import base64
 
 app = Flask(__name__)
 
@@ -55,23 +54,6 @@ def login():
         return jsonify({"status": "Login successful"}), 200
     else:
         return jsonify({"status": "Invalid username or password"}), 401
-
-# Endpoint to list all user details.
-@app.route('/users', methods=['GET'])
-def list_users():
-    conn = sqlite3.connect('users.db')
-    c = conn.cursor()
-    c.execute('SELECT username, salt, hash FROM users')
-    users = c.fetchall()  # This fetches all rows as a list of tuples
-    conn.close()
-    user_details = [
-        {
-            'username': user[0],
-            'salt': base64.b64encode(user[1]).decode('utf-8'),  # Encode bytes to base64 and then decode to string
-            'hash': base64.b64encode(user[2]).decode('utf-8')   # Same here
-        } for user in users
-    ]
-    return jsonify(user_details), 200
 
 
 if __name__ == '__main__':
